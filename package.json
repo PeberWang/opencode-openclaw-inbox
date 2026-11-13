@@ -1,10 +1,10 @@
 {
   "name": "opencode-openclaw-inbox",
-  "version": "0.1.0",
-  "description": "OpenCode Desktop inbox for tasks that OpenClaw (or any script) dispatches with `opencode run --archived`: live status, unread dots, one-click open, and auto-unarchive when you take a task over.",
+  "version": "0.2.0",
+  "description": "OpenCode Desktop inbox for tasks that OpenClaw (or any script) dispatches with `opencode run --archived`: a quiet badge in the session header, a macOS menubar item, one-click open, and auto-unarchive when you take a task over.",
   "type": "module",
   "license": "MIT",
-  "keywords": ["opencode", "opencode-plugin", "gui", "desktop", "inbox", "openclaw", "background-tasks"],
+  "keywords": ["opencode", "opencode-plugin", "gui", "desktop", "inbox", "menubar", "openclaw", "background-tasks"],
   "exports": {
     "./gui-experimental": "./dist/gui-experimental.cjs"
   },
