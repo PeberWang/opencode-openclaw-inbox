@@ -1,4 +1,6 @@
-// The few Electron APIs the main process uses; the app provides `electron` at runtime.
+// The few Electron and Node APIs the main process uses; the app provides them at runtime.
+declare const process: { readonly platform: string }
+
 declare module "electron" {
   export interface NativeImage {
     isEmpty(): boolean

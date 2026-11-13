@@ -9,28 +9,37 @@ An OpenCode Desktop GUI plugin that gives tasks dispatched by another agent (Ope
 - **Take over**: send a message from the desktop composer in an archived task and the plugin unarchives it, so it becomes a regular session. Home lists it under **All projects** or under its own project. Follow-ups from the dispatcher (`opencode run -s <id> "..."`) keep it archived.
 - **Command palette**: "Open OpenClaw inbox" lists the same tasks from anywhere.
 
+Read tasks leave the inbox after 24 hours by default. Anything running, unread or failed stays until you have seen it.
+
 ## Install
 
-GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`):
+```bash
+opencode plugin add opencode-openclaw-inbox
+```
+
+GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`), which `opencode plugin add` writes to. To set options, use the object form:
 
 ```jsonc
 {
-  "plugins": [{ "package": "/path/to/openclaw-inbox", "options": { "locale": "zh" } }],
+  "plugins": [{ "package": "opencode-openclaw-inbox", "options": { "locale": "zh", "days": 3 } }],
 }
 ```
 
-| Option   | Default         | Meaning                                    |
-| -------- | --------------- | ------------------------------------------ |
-| `prefix` | `"🦞"`          | Title prefix that marks a dispatched task  |
-| `days`   | `7`             | Only list tasks updated in the last N days |
-| `max`    | `15`            | Tasks in the menubar menu                  |
-| `locale` | follows the app | `"en"` or `"zh"`                           |
+| Option   | Default         | Meaning                                       |
+| -------- | --------------- | --------------------------------------------- |
+| `prefix` | `"🦞"`          | Title prefix that marks a dispatched task     |
+| `days`   | `1`             | Days a read task stays in the inbox           |
+| `max`    | `15`            | Tasks in the menubar menu                     |
+| `locale` | follows the app | `"en"` or `"zh"`                              |
 
-Build the bundle after cloning or editing:
+## Develop
+
+Load a local checkout by path instead of the package name, then rebuild on save:
 
 ```bash
 npm install
-npm run build        # or: npm run dev (rebuilds on save; the desktop app reloads the GUI and the menubar item)
+npm run dev     # the desktop app reloads the GUI and the menubar item on every build
+npm test
 ```
 
 ## How it works
@@ -44,7 +53,12 @@ npm run build        # or: npm run dev (rebuilds on save; the desktop app reload
 ## Notes
 
 - On a Mac with a notch, macOS hides menubar items that do not fit beside a long app menu. ⌘-drag `🦞` toward the clock to keep it visible.
+- The menubar item is macOS only; the header badge works on every platform.
 - Requires OpenCode Desktop 2.2.7 or newer. The GUI plugin API is experimental and may change between releases.
+
+## 中文说明
+
+给 OpenCode 桌面版加一个「OpenClaw 任务收件箱」：OpenClaw（或任何脚本）用 `opencode run --archived --title "🦞 任务名"` 派的活不再堆进主页，而是进收件箱。会话标题栏右上角有一个安静的 `🦞` 徽标，点开是可滚动的任务列表；macOS 菜单栏常驻 `🦞` 计数，点任务直接跳回 OpenCode 的对应会话。你在桌面端接手发消息时，任务自动转为普通会话，在主页「所有项目」里能找到。已读任务默认只保留 24 小时，未读和失败的一直保留到你看过为止。
 
 ## License
 

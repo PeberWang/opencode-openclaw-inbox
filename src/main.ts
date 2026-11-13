@@ -35,6 +35,8 @@ const EVENTS = [
 const shorten = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text)
 
 export const main: Plugin.MainSetup = (ctx) => {
+  // Only macOS shows a status item's title; elsewhere the item would be a blank icon.
+  if (process.platform !== "darwin") return
   const options = readOptions(ctx.options)
   const text = pickCopy(options.locale ?? app.getLocale())
   const client = () => ctx.client as unknown as Client & {

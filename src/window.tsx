@@ -8,6 +8,7 @@ import {
   SERVER,
   clean,
   detail,
+  keep,
   loadTasks,
   markRead,
   pickCopy,
@@ -290,9 +291,7 @@ export const setup: Plugin.Setup = (ctx) => {
                   )}
                 </For>
               </div>
-              <div class="oci-foot">
-                {copy().footer.replace("{days}", String(options.days)).replace("{count}", String(tasks().length))}
-              </div>
+              <div class="oci-foot">{keep(copy(), options.days)}</div>
             </div>
           </Portal>
         </Show>

@@ -42,7 +42,7 @@ export function readOptions(raw: unknown): Options {
   const options = (raw ?? {}) as Record<string, unknown>
   return {
     prefix: typeof options.prefix === "string" && options.prefix ? options.prefix : "🦞",
-    days: typeof options.days === "number" ? options.days : 7,
+    days: typeof options.days === "number" ? options.days : 1,
     max: typeof options.max === "number" ? options.max : 15,
     locale: typeof options.locale === "string" ? options.locale : undefined,
   }
@@ -66,7 +66,9 @@ const EN = {
   quiet: "Nothing running or unread",
   readAll: "Mark all read",
   openApp: "Open OpenCode",
-  footer: "Last {days} days · {count} tasks",
+  keep: "Unread tasks stay; read ones for {window}",
+  hours: "24 hours",
+  days: "{n} days",
   now: "just now",
   ago: " ago",
   min: "{n}m",
@@ -94,7 +96,9 @@ const ZH: Copy = {
   quiet: "没有运行中或未读的任务",
   readAll: "全部标为已读",
   openApp: "打开 OpenCode",
-  footer: "最近 {days} 天 · 共 {count} 个",
+  keep: "未读的一直保留，已读的保留 {window}",
+  hours: "24 小时",
+  days: "{n} 天",
   now: "刚刚",
   ago: "前",
   min: "{n} 分钟",
@@ -170,6 +174,10 @@ export function detail(text: Copy, task: Task) {
   return `${project(task.directory)} · ${label} · ${since === text.now ? since : since + text.ago}${taken}`
 }
 
+export function keep(text: Copy, days: number) {
+  return text.keep.replace("{window}", days === 1 ? text.hours : text.days.replace("{n}", String(days)))
+}
+
 export function toTask(session: Session, prefix: string): Task | undefined {
   const title = session.title ?? ""
   if (!title.startsWith(prefix) || session.parentID) return undefined
@@ -187,6 +195,7 @@ export function toTask(session: Session, prefix: string): Task | undefined {
 }
 
 // Search narrows the list server-side; fall back to recent sessions if the server's search skips the prefix.
+// The day window drops only read tasks: anything running, unread or failed stays until it has been seen.
 export async function loadTasks(client: Client, options: Options) {
   const list = async (search?: string) =>
     (await client.session.list({ search, limit: 100, order: "desc" })).data as Session[]
@@ -195,7 +204,7 @@ export async function loadTasks(client: Client, options: Options) {
   const cutoff = Date.now() - options.days * 24 * 60 * MINUTE
   return sessions
     .map((session) => toTask(session, options.prefix))
-    .filter((task): task is Task => !!task && task.updated >= cutoff)
+    .filter((task): task is Task => !!task && (task.updated >= cutoff || status(task) !== "read"))
 }
 
 export async function markRead(client: Client, tasks: readonly Task[]) {
