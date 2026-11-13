@@ -30,7 +30,7 @@ GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`)
 | `prefix` | `"🦞"`          | Title prefix that marks a dispatched task     |
 | `days`   | `1`             | Days a read task stays in the inbox           |
 | `max`    | `15`            | Tasks in the menubar menu                     |
-| `locale` | follows the app | `"en"` or `"zh"`                              |
+| `locale` | `"en"`          | `"en"`, `"zh"`, or `"auto"` to follow OpenCode |
 
 ## Develop
 
@@ -58,7 +58,7 @@ npm test
 
 ## 中文说明
 
-给 OpenCode 桌面版加一个「OpenClaw 任务收件箱」：OpenClaw（或任何脚本）用 `opencode run --archived --title "🦞 任务名"` 派的活不再堆进主页，而是进收件箱。会话标题栏右上角有一个安静的 `🦞` 徽标，点开是可滚动的任务列表；macOS 菜单栏常驻 `🦞` 计数，点任务直接跳回 OpenCode 的对应会话。你在桌面端接手发消息时，任务自动转为普通会话，在主页「所有项目」里能找到。已读任务默认只保留 24 小时，未读和失败的一直保留到你看过为止。
+给 OpenCode 桌面版加一个「OpenClaw 任务收件箱」：OpenClaw（或任何脚本）用 `opencode run --archived --title "🦞 任务名"` 派的活不再堆进主页，而是进收件箱。会话标题栏右上角有一个安静的 `🦞` 徽标，点开是可滚动的任务列表；macOS 菜单栏常驻 `🦞` 计数，点任务直接跳回 OpenCode 的对应会话。你在桌面端接手发消息时，任务自动转为普通会话，在主页「所有项目」里能找到。已读任务默认只保留 24 小时，未读和失败的一直保留到你看过为止。界面默认英文，在插件选项里设 `"locale": "zh"` 切换为中文，设 `"auto"` 跟随 OpenCode 的界面语言。
 
 ## License
 

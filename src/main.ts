@@ -38,7 +38,7 @@ export const main: Plugin.MainSetup = (ctx) => {
   // Only macOS shows a status item's title; elsewhere the item would be a blank icon.
   if (process.platform !== "darwin") return
   const options = readOptions(ctx.options)
-  const text = pickCopy(options.locale ?? app.getLocale())
+  const text = pickCopy(options.locale === "auto" ? app.getLocale() : options.locale)
   const client = () => ctx.client as unknown as Client & {
     event: {
       subscribe(input: { types: readonly string[] }, request: { signal: AbortSignal }): AsyncIterable<unknown>

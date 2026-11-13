@@ -26,9 +26,11 @@ test("status follows busy, idle and viewed", () => {
   assert.equal(status(task({ busy: 1, idle: 2, viewed: 2 })), "read")
 })
 
-test("defaults to a one-day window", () => {
+test("defaults to a one-day window in English", () => {
   assert.equal(readOptions(undefined).days, 1)
   assert.equal(readOptions({ days: 3 }).days, 3)
+  assert.equal(readOptions(undefined).locale, "en")
+  assert.equal(readOptions({ locale: "zh" }).locale, "zh")
 })
 
 test("the window drops old read tasks and keeps anything not yet seen", async () => {

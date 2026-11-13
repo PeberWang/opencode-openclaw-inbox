@@ -32,7 +32,7 @@ type HeaderInput = { readonly active: boolean; readonly compact: boolean }
 
 export const setup: Plugin.Setup = (ctx) => {
   const options = readOptions(ctx.options)
-  const copy = () => pickCopy(options.locale ?? ctx.locale.locale())
+  const copy = () => pickCopy(options.locale === "auto" ? ctx.locale.locale() : options.locale)
   const client = () => (ctx.servers.get(SERVER)?.client ?? ctx.client) as unknown as Client & {
     session: {
       get(input: { sessionID: string }): Promise<unknown>
