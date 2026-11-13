@@ -1,0 +1,26 @@
+{
+  "name": "opencode-openclaw-inbox",
+  "version": "0.1.0",
+  "description": "OpenCode Desktop inbox for tasks that OpenClaw (or any script) dispatches with `opencode run --archived`: live status, unread dots, one-click open, and auto-unarchive when you take a task over.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["opencode", "opencode-plugin", "gui", "desktop", "inbox", "openclaw", "background-tasks"],
+  "exports": {
+    "./gui-experimental": "./dist/gui-experimental.cjs"
+  },
+  "files": ["dist", "src", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opencode/plugin": "2.2.7"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.0.0",
+    "vite-plugin-solid": "^2.11.0"
+  }
+}
