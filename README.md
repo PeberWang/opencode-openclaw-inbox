@@ -41,8 +41,16 @@ GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`)
 A task only reaches the inbox if it is started with **both** `--archived` and the title prefix. Agents forget one of them more often than you would expect, especially smaller models that rebuild the command from memory. So instead of describing the convention in a prompt, give the agent a script that applies it:
 
 ```bash
-cp -R integrations/openclaw/opencode-dispatch ~/.openclaw/workspace/skills/
+d=~/.openclaw/workspace/skills/opencode-dispatch
+base=https://raw.githubusercontent.com/PeberWang/opencode-openclaw-inbox/v0.3.1/integrations/openclaw/opencode-dispatch
+mkdir -p "$d/scripts"
+curl -fsSL "$base/SKILL.md" -o "$d/SKILL.md"
+curl -fsSL "$base/scripts/opencode-dispatch" -o "$d/scripts/opencode-dispatch"
+chmod +x "$d/scripts/opencode-dispatch"
+openclaw skills info opencode-dispatch   # should say Ready
 ```
+
+No clone needed; the URLs are pinned to a release tag, so you get exactly the reviewed files. From a checkout, `cp -R integrations/openclaw/opencode-dispatch ~/.openclaw/workspace/skills/` does the same.
 
 That installs an OpenClaw skill with `scripts/opencode-dispatch`, a thin wrapper around `opencode run`. A new task always gets `--archived` and the prefix (a task without `--title` is refused); follow-ups with `-s <id>` pass through unchanged. Other agents can call the script the same way.
 
@@ -78,7 +86,7 @@ npm test
 
 ## 中文说明
 
-给 OpenCode 桌面版加一个「OpenClaw 任务收件箱」：OpenClaw（或任何脚本）用 `opencode run --archived --title "🦞 任务名"` 派的活不再堆进主页，而是进收件箱。会话标题栏右上角有一个安静的 `🦞` 徽标，点开是可滚动的任务列表；macOS 菜单栏常驻 `🦞` 计数，点任务直接跳回 OpenCode 的对应会话。你在桌面端接手发消息时，任务自动转为普通会话，在主页「所有项目」里能找到。已读任务默认只保留 24 小时，未读和失败的一直保留到你看过为止。给 OpenClaw 用时，把 `integrations/openclaw/opencode-dispatch` 拷进 `~/.openclaw/workspace/skills/`，并在 `AGENTS.md` 里要求它只用其中的 `opencode-dispatch` 脚本派活：脚本会强制加上 `--archived` 和 `🦞 ` 前缀，避免模型漏写导致任务进不了收件箱。界面默认英文，在插件选项里设 `"locale": "zh"` 切换为中文，设 `"auto"` 跟随 OpenCode 的界面语言。
+给 OpenCode 桌面版加一个「OpenClaw 任务收件箱」：OpenClaw（或任何脚本）用 `opencode run --archived --title "🦞 任务名"` 派的活不再堆进主页，而是进收件箱。会话标题栏右上角有一个安静的 `🦞` 徽标，点开是可滚动的任务列表；macOS 菜单栏常驻 `🦞` 计数，点任务直接跳回 OpenCode 的对应会话。你在桌面端接手发消息时，任务自动转为普通会话，在主页「所有项目」里能找到。已读任务默认只保留 24 小时，未读和失败的一直保留到你看过为止。给 OpenClaw 用时，用上面「Using it with OpenClaw」一节的命令把 `opencode-dispatch` 技能装进 `~/.openclaw/workspace/skills/`（不用克隆仓库），并在 `AGENTS.md` 里要求它只用其中的 `opencode-dispatch` 脚本派活：脚本会强制加上 `--archived` 和 `🦞 ` 前缀，避免模型漏写导致任务进不了收件箱。界面默认英文，在插件选项里设 `"locale": "zh"` 切换为中文，设 `"auto"` 跟随 OpenCode 的界面语言。
 
 ## License
 
