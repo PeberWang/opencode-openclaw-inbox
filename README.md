@@ -8,7 +8,7 @@ An OpenCode Desktop GUI plugin that gives tasks dispatched by another agent (Ope
 
 - **Dispatch** with `opencode run --archived --title "🦞 <task>" "<prompt>"`. `--archived` keeps the session out of Home and the session lists; the `🦞 ` title prefix puts it in the inbox.
 - **Session header badge**: a quiet `🦞 ●1 ●2` at the top right of the session title row, beside the context usage. It shows a colored count only for tasks that are running, unread or failed. Click it for a list of every task: status, project and age, in a fixed-height list that scrolls. Click a row to open the task as a tab, which also marks it read.
-- **macOS menubar item**: `🦞 🟡1 🟢2` stays in the menubar while OpenCode Desktop runs, even with its windows closed. Click a task in its menu and OpenCode comes forward on that session.
+- **macOS menubar item**: `🦞 🟡1 🟢2` stays in the menubar while OpenCode Desktop runs, even with its windows closed. Click a task in its menu and OpenCode comes forward on that session. A native menu cannot scroll, so it lists 15 tasks (running, failed and unread first, then the most recent) and ends with a "N more" row; the header list in the window has them all.
 - **Get notified** when a task finishes: a system notification, or a toast while the window has focus.
 - **Take over**: send a message from the desktop composer in an archived task and the plugin unarchives it, so it becomes a regular session. Home lists it under **All projects** or under its own project. Follow-ups from the dispatcher (`opencode run -s <id> "..."`) keep it archived.
 - **Command palette**: "Open OpenClaw inbox" lists the same tasks from anywhere.
@@ -33,7 +33,7 @@ GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`)
 | -------- | --------------- | --------------------------------------------- |
 | `prefix` | `"🦞"`          | Title prefix that marks a dispatched task     |
 | `days`   | `1`             | Days a read task stays in the inbox           |
-| `max`    | `15`            | Tasks in the menubar menu                     |
+| `max`    | `15`            | Tasks in the menubar menu; the rest sit behind a "N more" row that opens OpenCode |
 | `locale` | `"en"`          | `"en"`, `"zh"`, or `"auto"` to follow OpenCode |
 
 ## Using it with OpenClaw (or any agent)

@@ -117,7 +117,10 @@ export const main: Plugin.MainSetup = (ctx) => {
 
   const menu = () => {
     const counts = tally(tasks)
-    const list = sortTasks(tasks).slice(0, options.max)
+    // A native menu cannot scroll, so it stops at `max` and points to the window's scrolling list for the rest.
+    const sorted = sortTasks(tasks)
+    const list = sorted.slice(0, options.max)
+    const hidden = sorted.length - list.length
     const rows: MenuItemConstructorOptions[] = list.length
       ? list.map((task) => ({
           label: shorten(`${DOT[status(task)]}  ${clean(task.title, options.prefix)}`, 60),
@@ -129,6 +132,7 @@ export const main: Plugin.MainSetup = (ctx) => {
       { label: `${text.title} · ${summary(text, counts) || text.quiet}`, enabled: false },
       { type: "separator" },
       ...rows,
+      ...(hidden > 0 ? [{ label: text.more.replace("{n}", String(hidden)), click: openApp }] : []),
       { type: "separator" },
       {
         label: text.readAll,
