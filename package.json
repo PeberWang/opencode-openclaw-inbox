@@ -1,6 +1,6 @@
 {
   "name": "opencode-openclaw-inbox",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenCode Desktop inbox for tasks that OpenClaw (or any script) dispatches with `opencode run --archived`: a quiet badge in the session header, a macOS menubar item, one-click open, and auto-unarchive when you take a task over.",
   "type": "module",
   "license": "MIT",
@@ -29,6 +29,7 @@
   "files": [
     "dist",
     "src",
+    "integrations",
     "README.md",
     "LICENSE"
   ],
@@ -36,7 +37,7 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/shared.test.ts",
+    "test": "node --test test/*.test.ts",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {

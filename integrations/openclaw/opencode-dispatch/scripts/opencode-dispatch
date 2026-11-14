@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Hand a task to OpenCode so it lands in the opencode-openclaw-inbox inbox.
+#
+#   opencode-dispatch --title "<task name>" [opencode run flags] "<task brief>"
+#   opencode-dispatch -s <session-id> [opencode run flags] "<more instructions>"
+#
+# A new task always gets --archived and the inbox prefix on its title, so the
+# caller cannot forget either. Follow-ups (-s / -c) are passed through as-is,
+# which keeps a dispatched task archived and leaves a taken-over one alone.
+#
+# OPENCODE_INBOX_PREFIX         title prefix, must match the plugin's `prefix` option (default "🦞 ")
+# OPENCODE_DISPATCH_DRY_RUN=1   print the command instead of running it
+set -euo pipefail
+
+prefix="${OPENCODE_INBOX_PREFIX:-🦞 }"
+mark="${prefix%% }"
+args=()
+title=""
+has_title=0
+follow_up=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --title)
+      [ $# -ge 2 ] || { echo "opencode-dispatch: --title needs a value" >&2; exit 2; }
+      title="$2"; has_title=1; shift 2; continue ;;
+    --title=*)
+      title="${1#--title=}"; has_title=1; shift; continue ;;
+    --archived)
+      shift; continue ;;
+    -s|--session|--session=*|-c|--continue)
+      follow_up=1 ;;
+  esac
+  args+=("$1")
+  shift
+done
+
+if [ "$has_title" = 1 ]; then
+  # Accept "🦞 x", "🦞x" or "x"; always end up with "<prefix>x".
+  rest="${title#"$mark"}"
+  rest="${rest#"${rest%%[! ]*}"}"
+  title="$prefix$rest"
+fi
+
+if [ "$follow_up" = 0 ]; then
+  if [ "$has_title" = 0 ] || [ -z "$rest" ]; then
+    echo "opencode-dispatch: a new task needs --title \"<task name>\"" >&2
+    exit 2
+  fi
+  args=(--archived ${args[@]+"${args[@]}"})
+fi
+
+[ "$has_title" = 1 ] && args=(--title "$title" ${args[@]+"${args[@]}"})
+
+if [ "${OPENCODE_DISPATCH_DRY_RUN:-}" = 1 ]; then
+  printf '%s\n' opencode run ${args[@]+"${args[@]}"}
+  exit 0
+fi
+
+exec opencode run ${args[@]+"${args[@]}"}
