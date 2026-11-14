@@ -1,6 +1,10 @@
 # opencode-openclaw-inbox
 
-An OpenCode Desktop GUI plugin that gives tasks dispatched by another agent (OpenClaw, a script, a cron job) their own inbox, instead of piling them into Home and the session lists.
+An OpenCode Desktop GUI plugin that gives tasks dispatched by another agent (OpenClaw, a script, a cron job) their own inbox, instead of piling them into Home and the session lists. The inbox lives in the macOS menubar, so you can see what your agents are doing without switching to OpenCode.
+
+![Menubar item showing one running and two unread tasks](https://raw.githubusercontent.com/PeberWang/opencode-openclaw-inbox/master/docs/menubar.png)
+
+![The session header badge and its task list](https://raw.githubusercontent.com/PeberWang/opencode-openclaw-inbox/master/docs/inbox-dropdown.png)
 
 - **Dispatch** with `opencode run --archived --title "🦞 <task>" "<prompt>"`. `--archived` keeps the session out of Home and the session lists; the `🦞 ` title prefix puts it in the inbox.
 - **Session header badge**: a quiet `🦞 ●1 ●2` at the top right of the session title row, beside the context usage. It shows a colored count only for tasks that are running, unread or failed. Click it for a list of every task: status, project and age, in a fixed-height list that scrolls. Click a row to open the task as a tab, which also marks it read.
