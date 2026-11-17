@@ -44,7 +44,7 @@ A task only reaches the inbox if it is started with **both** `--archived` and th
 
 ```bash
 d=~/.openclaw/workspace/skills/opencode-dispatch
-base=https://raw.githubusercontent.com/PeberWang/opencode-openclaw-inbox/v0.3.1/integrations/openclaw/opencode-dispatch
+base=https://raw.githubusercontent.com/PeberWang/opencode-openclaw-inbox/v0.4.0/integrations/openclaw/opencode-dispatch
 mkdir -p "$d/scripts"
 curl -fsSL "$base/SKILL.md" -o "$d/SKILL.md"
 curl -fsSL "$base/scripts/opencode-dispatch" -o "$d/scripts/opencode-dispatch"
@@ -65,6 +65,10 @@ Then add a line like this to the agent's standing instructions (for OpenClaw, th
 > To hand work to OpenCode, always run `~/.openclaw/workspace/skills/opencode-dispatch/scripts/opencode-dispatch --title "<task>" ...` from the project directory. Never call `opencode run` directly for a new task.
 
 If a task still slips through, fix it in place: `opencode api patch /api/session/<id> --data '{"title":"🦞 <task>","archived":true}'`.
+
+## Going further: OpenClaw Desk
+
+The inbox tells you a dispatched task exists and lets you jump to it. If you would rather not read OpenCode sessions at all, [OpenClaw Desk](https://github.com/PeberWang/openclaw-desk) is a companion macOS app: a project-manager agent follows each handed-off task, checks the delivery itself, and puts a one-sentence brief with at most two decisions on a quiet panel. You answer with a click; it relays to OpenCode. It uses this plugin's `opencode-dispatch --detach` and open requests, and you can switch the inbox's own entry points off (`"header": false, "tray": false`) so the Desk is the only one.
 
 ## Develop
 
