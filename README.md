@@ -35,6 +35,8 @@ GUI parts load only from the global config (`~/.config/opencode/opencode.jsonc`)
 | `days`   | `1`             | Days a read task stays in the inbox           |
 | `max`    | `15`            | Tasks in the menubar menu; the rest sit behind a "N more" row that opens OpenCode |
 | `locale` | `"en"`          | `"en"`, `"zh"`, or `"auto"` to follow OpenCode |
+| `header` | `true`          | Show the badge in the session header          |
+| `tray`   | `true`          | Show the macOS menubar item                   |
 
 ## Using it with OpenClaw (or any agent)
 
@@ -53,6 +55,10 @@ openclaw skills info opencode-dispatch   # should say Ready
 No clone needed; the URLs are pinned to a release tag, so you get exactly the reviewed files. From a checkout, `cp -R integrations/openclaw/opencode-dispatch ~/.openclaw/workspace/skills/` does the same.
 
 That installs an OpenClaw skill with `scripts/opencode-dispatch`, a thin wrapper around `opencode run`. A new task always gets `--archived` and the prefix (a task without `--title` is refused); follow-ups with `-s <id>` pass through unchanged. Other agents can call the script the same way.
+
+`--detach` starts the task in the background and returns as soon as the session exists, printing its id. The agent that dispatched never gets a completion notice, which is what you want when something else follows the task (the inbox, or another app).
+
+Other local apps can open a task in OpenCode: write `{"sessionID": "ses_…", "at": <epoch ms>}` to `~/Library/Application Support/opencode-openclaw-inbox/open-session`. The plugin picks it up within a moment (requests older than 30 seconds are ignored).
 
 Then add a line like this to the agent's standing instructions (for OpenClaw, the workspace `AGENTS.md`):
 

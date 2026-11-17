@@ -29,7 +29,7 @@ export type Task = {
 export type Status = "running" | "failed" | "unread" | "read"
 
 // `locale` is "en" (default), "zh", or "auto" to follow OpenCode's language.
-export type Options = { prefix: string; days: number; max: number; locale: string }
+export type Options = { prefix: string; days: number; max: number; locale: string; header: boolean; tray: boolean }
 
 // Structural, so the window's and main's clients both fit.
 export type Client = {
@@ -46,6 +46,8 @@ export function readOptions(raw: unknown): Options {
     days: typeof options.days === "number" ? options.days : 1,
     max: typeof options.max === "number" ? options.max : 15,
     locale: typeof options.locale === "string" && options.locale ? options.locale : "en",
+    header: options.header !== false,
+    tray: options.tray !== false,
   }
 }
 

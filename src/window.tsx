@@ -300,11 +300,12 @@ export const setup: Plugin.Setup = (ctx) => {
   }
 
   ctx.add(Style, css)
-  ctx.add(Slot, {
-    at: "session.header",
-    order: -100,
-    render: (input) => <Badge input={input} />,
-  })
+  if (options.header)
+    ctx.add(Slot, {
+      at: "session.header",
+      order: -100,
+      render: (input) => <Badge input={input} />,
+    })
 
   ctx.add(Command, () => ({
     id: "open",

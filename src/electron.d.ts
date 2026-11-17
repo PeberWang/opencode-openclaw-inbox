@@ -40,5 +40,6 @@ declare module "electron" {
     focus(options?: { steal: boolean }): void
     emit(event: string, ...args: unknown[]): boolean
     getLocale(): string
+    getPath(name: "appData" | "userData" | "home"): string
   }
 }

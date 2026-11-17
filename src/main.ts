@@ -1,3 +1,5 @@
+import { mkdirSync, readFileSync, unlinkSync, watch } from "node:fs"
+import { join } from "node:path"
 import { Menu, Tray as StatusItem, app, nativeImage, type BrowserWindow, type MenuItemConstructorOptions } from "electron"
 import type { Plugin } from "@opencode/plugin/gui"
 import { Tray } from "./contract"
@@ -31,6 +33,10 @@ const EVENTS = [
   "session.execution.failed",
   "session.execution.interrupted",
 ] as const
+
+// Other local apps (such as a desk) ask for a session by writing {"sessionID", "at"} to this file.
+const OPEN_REQUEST = "open-session"
+const OPEN_FRESH = 30_000
 
 const shorten = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text)
 
@@ -103,6 +109,37 @@ export const main: Plugin.MainSetup = (ctx) => {
     const window = target()
     if (window) reveal(window)
     else restore()
+  }
+
+  const requests_dir = join(app.getPath("appData"), "opencode-openclaw-inbox")
+  const takeRequest = () => {
+    const path = join(requests_dir, OPEN_REQUEST)
+    let request: { sessionID?: unknown; at?: unknown }
+    try {
+      request = JSON.parse(readFileSync(path, "utf8"))
+      unlinkSync(path)
+    } catch {
+      return
+    }
+    if (typeof request.sessionID !== "string" || !request.sessionID.startsWith("ses_")) return
+    if (typeof request.at === "number" && Date.now() - request.at > OPEN_FRESH) return
+    ctx.log.write("info", "openclaw-inbox open request", { sessionID: request.sessionID })
+    openTask(request.sessionID)
+  }
+  try {
+    mkdirSync(requests_dir, { recursive: true })
+    const watcher = watch(requests_dir, (_event, name) => {
+      if (name === OPEN_REQUEST) takeRequest()
+    })
+    ctx.onCleanup(() => watcher.close())
+    takeRequest()
+  } catch (error) {
+    ctx.log.write("warn", "openclaw-inbox cannot watch open requests", { error: String(error) })
+  }
+
+  if (!options.tray) {
+    ctx.log.write("info", "openclaw-inbox menubar disabled by option")
+    return
   }
 
   const item = new StatusItem(nativeImage.createEmpty())

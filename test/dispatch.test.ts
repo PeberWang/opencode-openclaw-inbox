@@ -28,6 +28,13 @@ test("follow-ups pass through untouched", () => {
   assert.deepEqual(dispatch("--continue", "more").argv, ["--continue", "more"])
 })
 
+test("--detach is consumed, not passed to opencode", () => {
+  const run = dispatch("--detach", "--title", "x", "go")
+  assert.deepEqual(run.argv, ["--title", "🦞 x", "--archived", "go"])
+  assert.match(run.stderr, /would detach/)
+  assert.deepEqual(dispatch("-s", "ses_1", "--detach", "more").argv, ["-s", "ses_1", "more"])
+})
+
 test("a new task without a title is refused", () => {
   for (const args of [["go"], ["--title", "🦞 ", "go"]]) {
     const run = dispatch(...args)

@@ -3,10 +3,16 @@
 #
 #   opencode-dispatch --title "<task name>" [opencode run flags] "<task brief>"
 #   opencode-dispatch -s <session-id> [opencode run flags] "<more instructions>"
+#   opencode-dispatch --detach --title "<task name>" ...   start it and return at once
 #
 # A new task always gets --archived and the inbox prefix on its title, so the
 # caller cannot forget either. Follow-ups (-s / -c) are passed through as-is,
 # which keeps a dispatched task archived and leaves a taken-over one alone.
+#
+# --detach runs OpenCode in the background, detached from the caller, waits until
+# the session exists, prints one line with its id and exits. The caller never gets a
+# completion notice; something else (the inbox, or a desk) follows the session.
+# Output goes to $XDG_STATE_HOME/opencode-dispatch/ (default ~/.local/state/...).
 #
 # OPENCODE_INBOX_PREFIX         title prefix, must match the plugin's `prefix` option (default "🦞 ")
 # OPENCODE_DISPATCH_DRY_RUN=1   print the command instead of running it
@@ -18,6 +24,7 @@ args=()
 title=""
 has_title=0
 follow_up=0
+detach=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -28,6 +35,8 @@ while [ $# -gt 0 ]; do
       title="${1#--title=}"; has_title=1; shift; continue ;;
     --archived)
       shift; continue ;;
+    --detach)
+      detach=1; shift; continue ;;
     -s|--session|--session=*|-c|--continue)
       follow_up=1 ;;
   esac
@@ -53,8 +62,43 @@ fi
 [ "$has_title" = 1 ] && args=(--title "$title" ${args[@]+"${args[@]}"})
 
 if [ "${OPENCODE_DISPATCH_DRY_RUN:-}" = 1 ]; then
+  [ "$detach" = 1 ] && echo "opencode-dispatch: would detach" >&2
   printf '%s\n' opencode run ${args[@]+"${args[@]}"}
   exit 0
 fi
 
-exec opencode run ${args[@]+"${args[@]}"}
+[ "$detach" = 1 ] || exec opencode run ${args[@]+"${args[@]}"}
+
+logs="${XDG_STATE_HOME:-$HOME/.local/state}/opencode-dispatch"
+mkdir -p "$logs"
+log="$logs/$(date +%Y%m%d-%H%M%S)-$$.log"
+started=$(( $(date +%s) * 1000 ))
+nohup opencode run ${args[@]+"${args[@]}"} >"$log" 2>&1 </dev/null &
+pid=$!
+
+session=""
+if [ "$follow_up" = 0 ]; then
+  query=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))' "$title")
+  for _ in $(seq 1 30); do
+    session=$(opencode api get "/api/session?search=$query&limit=5" 2>/dev/null | python3 -c '
+import json, sys
+title, since = sys.argv[1], int(sys.argv[2]) - 5000
+try:
+    items = json.load(sys.stdin).get("data", [])
+except ValueError:
+    items = []
+match = [s for s in items if s.get("title") == title and (s.get("time") or {}).get("created", 0) >= since]
+print(match[0]["id"] if match else "")
+' "$title" "$started" || true)
+    [ -n "$session" ] && break
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 1
+  done
+fi
+
+if ! kill -0 "$pid" 2>/dev/null && [ -z "$session" ] && [ "$follow_up" = 0 ]; then
+  echo "opencode-dispatch: opencode exited before the session appeared; see $log" >&2
+  tail -5 "$log" >&2
+  exit 1
+fi
+echo "dispatched in background: ${title:-follow-up} (session ${session:-see log}, pid $pid, log $log)"
