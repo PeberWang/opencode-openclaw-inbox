@@ -1,1 +1,4 @@
 node_modules/
+
+# local agent notes (reference a file outside this repository)
+CLAUDE.md
