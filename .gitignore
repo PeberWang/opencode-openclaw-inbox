@@ -2,3 +2,8 @@ node_modules/
 
 # local agent notes (reference a file outside this repository)
 CLAUDE.md
+
+# promotion copy (forum posts, launch notes) stays local
+/docs/forum-post.md
+launch-posts.md
+promo/
